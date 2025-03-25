@@ -49,63 +49,68 @@ local keys = {
    },
 
    -- cursor movement --
-   { key = 'LeftArrow',  mods = mod.SUPER,     action = act.SendString '\u{1b}OH' },
-   { key = 'RightArrow', mods = mod.SUPER,     action = act.SendString '\u{1b}OF' },
-   { key = 'Backspace',  mods = mod.SUPER,     action = act.SendString '\u{15}' },
+   -- { key = 'LeftArrow',  mods = mod.SUPER,     action = act.SendString '\u{1b}OH' },
+   -- { key = 'RightArrow', mods = mod.SUPER,     action = act.SendString '\u{1b}OF' },
+   -- { key = 'Backspace',  mods = mod.SUPER,     action = act.SendString '\u{15}' },
 
    -- copy/paste --
-   { key = 'c',          mods = 'CTRL|SHIFT',  action = act.CopyTo('Clipboard') },
-   { key = 'v',          mods = 'CTRL|SHIFT',  action = act.PasteFrom('Clipboard') },
+   { key = 'c', mods = 'CTRL|SHIFT',  action = act.CopyTo('Clipboard') },
+   { key = 'v', mods = 'CTRL|SHIFT',  action = act.PasteFrom('Clipboard') },
 
    -- tabs --
    -- tabs: spawn+close
-   { key = 't',          mods = mod.SUPER,     action = act.SpawnTab('DefaultDomain') },
-   { key = 't',          mods = mod.SUPER_REV, action = act.SpawnTab({ DomainName = 'WSL:Ubuntu' }) },
-   { key = 'w',          mods = mod.SUPER_REV, action = act.CloseCurrentTab({ confirm = false }) },
+   { key = 't', mods = 'CTRL|SHIFT',  action = act.SpawnTab('DefaultDomain') },
+   -- { key = 't',          mods = mod.SUPER_REV, action = act.SpawnTab({ DomainName = 'WSL:Ubuntu' }) },
+   { key = 'w', mods = 'CTRL|SHIFT',  action = act.CloseCurrentTab({ confirm = false }) },
 
    -- tabs: navigation
-   { key = '[',          mods = mod.SUPER,     action = act.ActivateTabRelative(-1) },
-   { key = ']',          mods = mod.SUPER,     action = act.ActivateTabRelative(1) },
-   { key = '[',          mods = mod.SUPER_REV, action = act.MoveTabRelative(-1) },
-   { key = ']',          mods = mod.SUPER_REV, action = act.MoveTabRelative(1) },
+   { key = '[', mods = 'CTRL',        action = act.ActivateTabRelative(-1) },
+   { key = ']', mods = 'CTRL',        action = act.ActivateTabRelative(1) },
+   { key = '[', mods = mod.SUPER_REV, action = act.MoveTabRelative(-1) },
+   { key = ']', mods = mod.SUPER_REV, action = act.MoveTabRelative(1) },
 
    -- tab: title
-   { key = '0',          mods = mod.SUPER,     action = act.EmitEvent('tabs.manual-update-tab-title') },
-   { key = '0',          mods = mod.SUPER_REV, action = act.EmitEvent('tabs.reset-tab-title') },
+   { key = '0', mods = 'CTRL',        action = act.EmitEvent('tabs.manual-update-tab-title') },
 
    -- tab: hide tab-bar
-   { key = '9',          mods = mod.SUPER,     action = act.EmitEvent('tabs.toggle-tab-bar'), },
+   { key = '9', mods = 'CTRL',        action = act.EmitEvent('tabs.toggle-tab-bar'), },
 
    -- window --
    -- window: spawn windows
-   { key = 'n',          mods = mod.SUPER,     action = act.SpawnWindow },
+   { key = 'n', mods = mod.SUPER,     action = act.SpawnWindow },
 
    -- window: zoom window
    {
       key = '-',
-      mods = mod.SUPER,
-      action = wezterm.action_callback(function(window, _pane)
-         local dimensions = window:get_dimensions()
-         if dimensions.is_full_screen then
-            return
-         end
-         local new_width = dimensions.pixel_width - 50
-         local new_height = dimensions.pixel_height - 50
-         window:set_inner_size(new_width, new_height)
-      end)
+      mods = 'CTRL',
+      action = act.DecreaseFontSize
+
+      -- Commented is if you want to resize the window or background or something
+      -- action = wezterm.action_callback(function(window, _pane)
+      --    local dimensions = window:get_dimensions()
+      --    if dimensions.is_full_screen then
+      --       return
+      --    end
+      --    local new_width = dimensions.pixel_width - 50
+      --    local new_height = dimensions.pixel_height - 50
+      --    window:set_inner_size(new_width, new_height)
+      -- end)
    },
    {
       key = '=',
-      mods = mod.SUPER,
-      action = wezterm.action_callback(function(window, _pane)
-         local dimensions = window:get_dimensions()
-         if dimensions.is_full_screen then
-            return
-         end
-         local new_width = dimensions.pixel_width + 50
-         local new_height = dimensions.pixel_height + 50
-         window:set_inner_size(new_width, new_height)
-      end)
+      mods = 'CTRL',
+      action = act.IncreaseFontSize
+
+      -- Commented is if you want to resize the window or background or something
+      -- action = wezterm.action_callback(function(window, _pane)
+      --    local dimensions = window:get_dimensions()
+      --    if dimensions.is_full_screen then
+      --       return
+      --    end
+      --    local new_width = dimensions.pixel_width + 50
+      --    local new_height = dimensions.pixel_height + 50
+      --    window:set_inner_size(new_width, new_height)
+      -- end)
    },
 
    -- background controls --

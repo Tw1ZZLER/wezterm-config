@@ -16,7 +16,7 @@ end
 -- stylua: ignore
 local keys = {
    -- misc/useful --
-   { key = 'F1', mods = 'NONE', action = 'ActivateCopyMode' },
+   -- { key = 'F1', mods = 'NONE', action = 'ActivateCopyMode' },
    { key = 'F2', mods = 'NONE', action = act.ActivateCommandPalette },
    { key = 'F3', mods = 'NONE', action = act.ShowLauncher },
    { key = 'F4', mods = 'NONE', action = act.ShowLauncherArgs({ flags = 'FUZZY|TABS' }) },
@@ -84,33 +84,11 @@ local keys = {
       key = '-',
       mods = 'CTRL',
       action = act.DecreaseFontSize
-
-      -- Commented is if you want to resize the window or background or something
-      -- action = wezterm.action_callback(function(window, _pane)
-      --    local dimensions = window:get_dimensions()
-      --    if dimensions.is_full_screen then
-      --       return
-      --    end
-      --    local new_width = dimensions.pixel_width - 50
-      --    local new_height = dimensions.pixel_height - 50
-      --    window:set_inner_size(new_width, new_height)
-      -- end)
    },
    {
       key = '=',
       mods = 'CTRL',
       action = act.IncreaseFontSize
-
-      -- Commented is if you want to resize the window or background or something
-      -- action = wezterm.action_callback(function(window, _pane)
-      --    local dimensions = window:get_dimensions()
-      --    if dimensions.is_full_screen then
-      --       return
-      --    end
-      --    local new_width = dimensions.pixel_width + 50
-      --    local new_height = dimensions.pixel_height + 50
-      --    window:set_inner_size(new_width, new_height)
-      -- end)
    },
 
    -- background controls --

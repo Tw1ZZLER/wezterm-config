@@ -1,6 +1,7 @@
 local wezterm = require('wezterm')
 local umath = require('utils.math')
 local Cells = require('utils.cells')
+local GpuAdapters = require('utils.gpu-adapter')
 local OptsValidator = require('utils.opts-validator')
 
 ---@alias Event.RightStatusOptions { date_format?: string }
@@ -25,7 +26,7 @@ local M = {}
 
 local ICON_SEPARATOR = nf.oct_dash
 local ICON_DATE = nf.fa_calendar
-
+local ICON_GPU = nf.md_expansion_card_variant
 ---@type string[]
 local discharging_icons = {
    nf.md_battery_10,
@@ -56,9 +57,10 @@ local charging_icons = {
 ---@type table<string, Cells.SegmentColors>
 -- stylua: ignore
 local colors = {
-   date      = { fg = '#fab387', bg = 'rgba(0, 0, 0, 0.4)' },
-   battery   = { fg = '#f9e2af', bg = 'rgba(0, 0, 0, 0.4)' },
-   separator = { fg = '#74c7ec', bg = 'rgba(0, 0, 0, 0.4)' }
+   separator = { fg = '#9399b2', bg = 'rgba(0, 0, 0, 0.4)' },
+   date      = { fg = '#f38ba8', bg = 'rgba(0, 0, 0, 0.4)' },
+   battery   = { fg = '#a6e3a1', bg = 'rgba(0, 0, 0, 0.4)' },
+   gpu       = { fg = '#89b4fa', bg = 'rgba(0, 0, 0, 0.4)' }
 }
 
 local cells = Cells:new()
@@ -69,7 +71,8 @@ cells
    :add_segment('separator', ' ' .. ICON_SEPARATOR .. '  ', colors.separator)
    :add_segment('battery_icon', '', colors.battery)
    :add_segment('battery_text', '', colors.battery, attr(attr.intensity('Bold')))
-
+   :add_segment('gpu_icon', ICON_GPU .. '  ', colors.gpu, attr(attr.intensity('Bold')))
+   :add_segment('gpu_adapter', '', colors.gpu, attr(attr.intensity('Bold')))
 ---@return string, string
 local function battery_info()
    -- ref: https://wezfurlong.org/wezterm/config/lua/wezterm/battery_info.html
@@ -106,12 +109,25 @@ M.setup = function(opts)
          :update_segment_text('date_text', wezterm.strftime(valid_opts.date_format))
          :update_segment_text('battery_icon', battery_icon)
          :update_segment_text('battery_text', battery_text)
-
-      window:set_right_status(
-         wezterm.format(
-            cells:render({ 'date_icon', 'date_text', 'separator', 'battery_icon', 'battery_text' })
+         :update_segment_text('gpu_icon', ICON_GPU .. '  ')
+         :update_segment_text(
+            'gpu_adapter',
+            (
+               GpuAdapters:pick_best()
+               and (GpuAdapters:pick_best().name .. ' (' .. GpuAdapters:pick_best().backend .. ')')
+            ) or ''
          )
-      )
+
+      window:set_right_status(wezterm.format(cells:render({
+         -- 'date_icon',
+         -- 'date_text',
+         -- 'separator',
+         -- 'battery_icon',
+         -- 'battery_text',
+         -- 'separator',
+         'gpu_icon',
+         'gpu_adapter',
+      })))
    end)
 end
 

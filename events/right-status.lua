@@ -26,7 +26,7 @@ local M = {}
 local ICON_SEPARATOR = nf.oct_dash
 local ICON_DATE = nf.fa_calendar
 local ICON_DISCRETE_GPU = nf.md_expansion_card_variant
-local ICON_INTEGRATED_GPU = nf.md_chip
+local ICON_INTEGRATED_GPU = nf.oct_cpu
 
 
 ---@type table<string, Cells.SegmentColors>

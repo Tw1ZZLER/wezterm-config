@@ -1,3 +1,5 @@
+local wezterm = require('wezterm')
+
 return {
    -- behaviours
    automatically_reload_config = true,
@@ -6,6 +8,12 @@ return {
    status_update_interval = 1000,
 
    scrollback_lines = 20000,
+
+   -- maximize on startup
+   wezterm.on('gui-startup', function()
+      local _, _, window = wezterm.mux.spawn_window({})
+      window:gui_window():maximize()
+   end),
 
    hyperlink_rules = {
       -- Matches: a URL in parens: (URL)

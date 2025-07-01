@@ -26,7 +26,9 @@ local M = {}
 
 local ICON_SEPARATOR = nf.oct_dash
 local ICON_DATE = nf.fa_calendar
-local ICON_GPU = nf.md_expansion_card_variant
+local ICON_DISCRETE_GPU = nf.md_expansion_card_variant
+local ICON_INTEGRATED_GPU = nf.md_chip
+
 ---@type string[]
 local discharging_icons = {
    nf.md_battery_10,
@@ -60,7 +62,9 @@ local colors = {
    separator = { fg = '#9399b2', bg = 'rgba(0, 0, 0, 0.4)' },
    date      = { fg = '#f38ba8', bg = 'rgba(0, 0, 0, 0.4)' },
    battery   = { fg = '#a6e3a1', bg = 'rgba(0, 0, 0, 0.4)' },
-   gpu       = { fg = '#89b4fa', bg = 'rgba(0, 0, 0, 0.4)' }
+   gpu_intel = { fg = '#89b4fa', bg = 'rgba(0, 0, 0, 0.4)' },
+   gpu_amd   = { fg = '#f38ba8', bg = 'rgba(0, 0, 0, 0.4)' },
+   gpu_nvidia = { fg = '#94e2d5', bg = 'rgba(0, 0, 0, 0.4)' },
 }
 
 local cells = Cells:new()
@@ -71,7 +75,7 @@ cells
    :add_segment('separator', ' ' .. ICON_SEPARATOR .. '  ', colors.separator)
    :add_segment('battery_icon', '', colors.battery)
    :add_segment('battery_text', '', colors.battery, attr(attr.intensity('Bold')))
-   :add_segment('gpu_icon', ICON_GPU .. '  ', colors.gpu, attr(attr.intensity('Bold')))
+   :add_segment('gpu_icon', '  ', colors.gpu, attr(attr.intensity('Bold')))
    :add_segment('gpu_adapter', '', colors.gpu, attr(attr.intensity('Bold')))
 ---@return string, string
 local function battery_info()
@@ -94,6 +98,35 @@ local function battery_info()
    return charge, icon .. ' '
 end
 
+---@return string, string
+local function gpu_info()
+   -- ref: https://wezfurlong.org/wezterm/config/lua/wezterm/gpu_adapters.html
+   local gpu = GpuAdapters:pick_best()
+   if not gpu then
+      return '', ''
+   end
+   local gpu_name = gpu.name or ''
+   local gpu_backend = gpu.backend or ''
+
+   -- Check if the GPU is Intel, AMD, or NVIDIA and set the color accordingly
+   if string.match(gpu_name, 'Intel') then
+      cells:update_segment_colors('gpu_adapter', colors.gpu_intel)
+   elseif string.match(gpu_name, 'AMD') then
+      cells:update_segment_colors('gpu_adapter', colors.gpu_amd)
+   elseif string.match(gpu_name, 'NVIDIA') then
+      cells:update_segment_colors('gpu_adapter', colors.gpu_nvidia)
+   end
+
+   -- Check if integrated or discrete and change icon
+   if gpu.device_type == 'IntegratedGpu' then
+      cells:update_segment_text('gpu_icon', ICON_INTEGRATED_GPU .. ' ')
+   else
+      cells:update_segment_text('gpu_icon', ICON_DISCRETE_GPU .. ' ')
+   end
+
+   return gpu_name, gpu_backend
+end
+
 ---@param opts? Event.RightStatusOptions Default: {date_format = '%a %H:%M:%S'}
 M.setup = function(opts)
    local valid_opts, err = EVENT_OPTS.validator:validate(opts or {})
@@ -104,19 +137,13 @@ M.setup = function(opts)
 
    wezterm.on('update-right-status', function(window, _pane)
       local battery_text, battery_icon = battery_info()
+      local gpu_name, gpu_backend = gpu_info()
 
       cells
          :update_segment_text('date_text', wezterm.strftime(valid_opts.date_format))
          :update_segment_text('battery_icon', battery_icon)
          :update_segment_text('battery_text', battery_text)
-         :update_segment_text('gpu_icon', ICON_GPU .. '  ')
-         :update_segment_text(
-            'gpu_adapter',
-            (
-               GpuAdapters:pick_best()
-               and (GpuAdapters:pick_best().name .. ' (' .. GpuAdapters:pick_best().backend .. ')')
-            ) or ''
-         )
+         :update_segment_text('gpu_adapter', gpu_name .. ' (' .. gpu_backend .. ')')
 
       window:set_right_status(wezterm.format(cells:render({
          -- 'date_icon',

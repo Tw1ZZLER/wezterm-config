@@ -28,39 +28,12 @@ local ICON_DATE = nf.fa_calendar
 local ICON_DISCRETE_GPU = nf.md_expansion_card_variant
 local ICON_INTEGRATED_GPU = nf.md_chip
 
----@type string[]
-local discharging_icons = {
-   nf.md_battery_10,
-   nf.md_battery_20,
-   nf.md_battery_30,
-   nf.md_battery_40,
-   nf.md_battery_50,
-   nf.md_battery_60,
-   nf.md_battery_70,
-   nf.md_battery_80,
-   nf.md_battery_90,
-   nf.md_battery,
-}
----@type string[]
-local charging_icons = {
-   nf.md_battery_charging_10,
-   nf.md_battery_charging_20,
-   nf.md_battery_charging_30,
-   nf.md_battery_charging_40,
-   nf.md_battery_charging_50,
-   nf.md_battery_charging_60,
-   nf.md_battery_charging_70,
-   nf.md_battery_charging_80,
-   nf.md_battery_charging_90,
-   nf.md_battery_charging,
-}
 
 ---@type table<string, Cells.SegmentColors>
 -- stylua: ignore
 local colors = {
    separator = { fg = '#9399b2', bg = 'rgba(0, 0, 0, 0.4)' },
    date      = { fg = '#f38ba8', bg = 'rgba(0, 0, 0, 0.4)' },
-   battery   = { fg = '#a6e3a1', bg = 'rgba(0, 0, 0, 0.4)' },
    gpu_intel = { fg = '#89b4fa', bg = 'rgba(0, 0, 0, 0.4)' },
    gpu_amd   = { fg = '#f38ba8', bg = 'rgba(0, 0, 0, 0.4)' },
    gpu_nvidia = { fg = '#94e2d5', bg = 'rgba(0, 0, 0, 0.4)' },
@@ -72,30 +45,8 @@ cells
    :add_segment('date_icon', ICON_DATE .. '  ', colors.date, attr(attr.intensity('Bold')))
    :add_segment('date_text', '', colors.date, attr(attr.intensity('Bold')))
    :add_segment('separator', ' ' .. ICON_SEPARATOR .. '  ', colors.separator)
-   :add_segment('battery_icon', '', colors.battery)
-   :add_segment('battery_text', '', colors.battery, attr(attr.intensity('Bold')))
    :add_segment('gpu_icon', '  ', colors.gpu, attr(attr.intensity('Bold')))
    :add_segment('gpu_adapter', '', colors.gpu, attr(attr.intensity('Bold')))
----@return string, string
-local function battery_info()
-   -- ref: https://wezfurlong.org/wezterm/config/lua/wezterm/battery_info.html
-
-   local charge = ''
-   local icon = ''
-
-   for _, b in ipairs(wezterm.battery_info()) do
-      local idx = b.state_of_charge
-      charge = string.format('%.0f%%', b.state_of_charge * 100)
-
-      if b.state == 'Charging' then
-         icon = charging_icons[idx]
-      else
-         icon = discharging_icons[idx]
-      end
-   end
-
-   return charge, icon .. ' '
-end
 
 ---@return string, string
 local function gpu_info()
@@ -134,22 +85,16 @@ M.setup = function(opts)
       wezterm.log_error(err)
    end
 
-   wezterm.on('update-right-status', function(window, _pane)
-      local battery_text, battery_icon = battery_info()
+   wezterm.on('update-right-status', function(window)
       local gpu_name, gpu_backend = gpu_info()
 
       cells
          :update_segment_text('date_text', wezterm.strftime(valid_opts.date_format))
-         :update_segment_text('battery_icon', battery_icon)
-         :update_segment_text('battery_text', battery_text)
          :update_segment_text('gpu_adapter', gpu_name .. ' (' .. gpu_backend .. ')')
 
       window:set_right_status(wezterm.format(cells:render({
          -- 'date_icon',
          -- 'date_text',
-         -- 'separator',
-         -- 'battery_icon',
-         -- 'battery_text',
          -- 'separator',
          'gpu_icon',
          'gpu_adapter',

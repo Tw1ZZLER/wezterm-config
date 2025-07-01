@@ -1,5 +1,4 @@
 local wezterm = require('wezterm')
-local umath = require('utils.math')
 local Cells = require('utils.cells')
 local GpuAdapters = require('utils.gpu-adapter')
 local OptsValidator = require('utils.opts-validator')
@@ -85,7 +84,7 @@ local function battery_info()
    local icon = ''
 
    for _, b in ipairs(wezterm.battery_info()) do
-      local idx = umath.clamp(umath.round(b.state_of_charge * 10), 1, 10)
+      local idx = b.state_of_charge
       charge = string.format('%.0f%%', b.state_of_charge * 100)
 
       if b.state == 'Charging' then

@@ -9,6 +9,9 @@ return {
 
    scrollback_lines = 20000,
 
+   -- kitty graphics
+   enable_kitty_graphics = true,
+
    -- maximize on startup
    wezterm.on('gui-startup', function()
       local _, _, window = wezterm.mux.spawn_window({})

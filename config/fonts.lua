@@ -1,13 +1,15 @@
 local wezterm = require('wezterm')
 local platform = require('utils.platform')
 
-local font_family = 'JetBrainsMono Nerd Font'
+-- local font_family = 'JetBrainsMono Nerd Font'
+-- local font_family = 'LigaConsolas Nerd Font'
+local font_family = 'VictorMono Nerd Font'
 local font_size = platform.is_mac and 12 or 9.5
 
 return {
    font = wezterm.font({
       family = font_family,
-      weight = 'Light',
+      weight = 'Medium',
    }),
    font_size = font_size,
 
